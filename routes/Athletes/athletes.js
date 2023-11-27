@@ -1,20 +1,14 @@
 
 import express from "express"
-import {
-    getCategory,
-    getCategoryId,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-} from "../../controllers/Category/categoryController.js"
-
+import { AthletetoComp, createAthlete, getAthleteOrg, getAthleteStatus, updateAthleteStatus } from "../../controllers/Athletes/athlete.js";
 
 const router = express.Router();
 
-router.get('/categorys', getCategory);
-router.get('/categorys/:id', getCategoryId);
-router.get('/categorys', createCategory);
-router.patch('/categorys/:id', updateCategory);
-router.delete('/categorys/:id', deleteCategory);
+router.get('/athlete/status-at', getAthleteStatus);
+router.get('/athlete/athlete-to-comptation', AthletetoComp);
+router.get('/athlete', getAthleteOrg);
+
+router.post('/athlete', createAthlete);
+router.patch('/athlete/status/:id', updateAthleteStatus);
 
 export default router

@@ -13,25 +13,192 @@ datasource db {
 
 model Category {
   id Int @id @default(autoincrement())
-  name String
-  type String
+  name String?
+  type String?
+  gender String?
+  access_age DateTime?
   createdAt DateTime @default(now())
+  jin    Jin[]
+  comp_to_categorys    Comp_to_category[]
+  athlete_to_comptation Athlete_to_comptation[]
 }
 
+model Jin {
+  id Int @id @default(autoincrement())
+  kg String?
+  category_id Int
+  category Category @relation(fields: [category_id], references: [id])
+}
 
 model Organization {
-  id         Int       @id @default(autoincrement())
-  type       String?
-  status     String?
-  email      String? @db.VarChar(255)
-  passwod    String? @db.VarChar(255)
-  name       String?
-  logo       String?
-  cover      String?
-  location   String?
-  address    String?
-  created_at DateTime?
-  phone_no   Int?
-  create_date DateTime?
+  id          Int       @id @default(autoincrement())
+  name        String?
+  created_date String?
   description String?
+  phone_no    String?
+  email       String?
+  logo        String?
+  address     String?
+  created_at  DateTime @default(now())
+  type        String?
+  status      String?
+  password    String?
+  province    String?
+  sum         String?
+  athletes    Athlete[]
+  athlete_to_comptation Athlete_to_comptation[]
+  comp_to_org Comptation_to_Organization[]
+
 }
+
+model Athlete {
+  id             Int                  @id @default(autoincrement())
+  username       String?
+  lastname       String?
+  birth_date     String?
+  register_no    String?
+  phone_no       String?
+  gender         String?
+  profile_img    String? @db.Text
+  document_img   String? @db.Text
+  created_at     DateTime?
+  status         String?
+  type           String?
+  org_id         Int
+  organization   Organization         @relation(fields: [org_id], references: [id])
+  athlete_to_comptation    Athlete_to_comptation[]
+  matches1       Matches[]            @relation("MatchesPlayer1")
+  matches2       Matches[]            @relation("MatchesPlayer2")
+  results        Results[]
+  repechange1    Repechage[]            @relation("RepeAthlete1")
+  repechange2    Repechage[]            @relation("RepeAthlete2")
+  repewinner     Repechage[]            @relation("RepeWinner")
+  final1         Finals[]            @relation("FinalAthlete1")
+  final2         Finals[]            @relation("FinalAthlete2")
+  finalwinner    Finals[]            @relation("FinalWinner")
+}
+
+model Comptation {
+  id                  Int                  @id @default(autoincrement())
+  name                String?
+  desc                String?
+  province            String?
+  sum                 String?
+  start_date          DateTime?
+  end_date            DateTime?
+  orgenizer           String?
+  cover_img           String?
+  mandat_price        Int?
+  more_address        String?
+  type                String?
+  created_at          DateTime             @default(now())
+  comp_to_categorys   Comp_to_category[]
+  athlete_to_comptation    Athlete_to_comptation[]
+  matches             Matches[]
+  results Results[]
+  groups Groups[]
+  repechage Repechage[]
+  final Finals[]
+  comp_to_org Comptation_to_Organization[]
+}
+
+model Comp_to_category {
+  id          Int       @id @default(autoincrement())
+  comp_id     Int
+  category_id Int
+  comptation Comptation @relation(fields: [comp_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id])
+}
+
+
+model Athlete_to_comptation {
+  id          Int       @id @default(autoincrement())
+  athlete_id     Int
+  comp_id Int
+  category_id Int
+  org_id Int
+  created_at  DateTime @default(now())
+  kg String
+  control_jin String?
+  status String?
+  comptation Comptation @relation(fields: [comp_id], references: [id])
+  athlete Athlete @relation(fields: [athlete_id], references: [id])
+  organization Organization @relation(fields: [org_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id])
+}
+
+model Matches {
+  id              Int        @id @default(autoincrement())
+  round           Int?
+  match_number    Int?
+  group           String?
+  kg              String?
+  comp_id         Int
+  athlete1_id     Int
+  athlete2_id     Int
+
+  athlete1        Athlete    @relation("MatchesPlayer1", fields: [athlete1_id], references: [id])
+  athlete2        Athlete    @relation("MatchesPlayer2", fields: [athlete2_id], references: [id])
+  comptation      Comptation @relation(fields: [comp_id], references: [id])
+}
+
+model Results {
+  id              Int        @id @default(autoincrement())
+  round           Int?
+  match_number    Int?
+  group           String?
+  kg              String?
+  comp_id         Int
+  winner_id     Int
+  winnerid      Athlete @relation(fields: [winner_id], references: [id])
+  comptation      Comptation @relation(fields: [comp_id], references: [id])
+}
+
+model Groups {
+  id              Int        @id @default(autoincrement())
+  group_name      String?
+  kg              String?
+  group_number    Int?
+  comp_id         Int
+  comptation      Comptation @relation(fields: [comp_id], references: [id])
+}
+
+model Repechage {
+  id              Int        @id @default(autoincrement())
+  round           Int?
+  match_number    Int?
+  kg              String?
+  comp_id         Int
+  athlete1_id     Int
+  athlete2_id     Int
+  winner_id       Int
+  athlete1        Athlete    @relation("RepeAthlete1", fields: [athlete1_id], references: [id])
+  athlete2        Athlete    @relation("RepeAthlete2", fields: [athlete2_id], references: [id])
+  winner        Athlete    @relation("RepeWinner", fields: [winner_id], references: [id])
+  comptation      Comptation @relation(fields: [comp_id], references: [id])
+}
+
+model Finals {
+  id              Int        @id @default(autoincrement())
+  round           Int?
+  match_number    Int?
+  kg              String?
+  comp_id         Int
+  athlete1_id     Int
+  athlete2_id     Int
+  winner_id       Int
+  athlete1        Athlete    @relation("FinalAthlete1", fields: [athlete1_id], references: [id])
+  athlete2        Athlete    @relation("FinalAthlete2", fields: [athlete2_id], references: [id])
+  winner        Athlete    @relation("FinalWinner", fields: [winner_id], references: [id])
+  comptation      Comptation @relation(fields: [comp_id], references: [id])
+}
+
+model Comptation_to_Organization {
+  id              Int        @id @default(autoincrement())
+  comp_id         Int
+  org_id          Int
+  status          String?
+  comptation      Comptation @relation(fields: [comp_id], references: [id])
+  organization      Organization @relation(fields: [org_id], references: [id])
+}
+
