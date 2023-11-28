@@ -7,14 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://admin:20010310JUdo*-+@judodb.crpujfw3miu6.ap-southeast-1.rds.amazonaws.com:3306/judodb"
+  url      = env("DATABASE_URL")
 }
-
-
-// datasource db {
-//   provider = "mysql"
-//   url      = env("DATABASE_URL")
-// }
 
 
 model Category {
