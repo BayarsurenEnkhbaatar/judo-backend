@@ -92,6 +92,7 @@ export const compAllList = async (req, res) => {
         res.status(404).json({msg: error.message});
     }
 }
+
 export const compFindId = async (req, res) => {
     try{
         const response = await prisma.comptation.findFirst({
