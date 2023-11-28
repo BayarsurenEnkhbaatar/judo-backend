@@ -32,5 +32,6 @@ app.use(UtilsRoute);
 
 const port = 5000
 app.listen(port, () => {
+    console.log(process.env.DATABASE_URL);
     console.log('Server up and running ... ' + port)
 });
