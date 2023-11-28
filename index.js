@@ -30,6 +30,7 @@ app.use(FinalAndRepechageRoute);
 app.use(ComptoOrgRoute);
 app.use(UtilsRoute);
 
-app.listen(process.env.APP_PORT, () => {
-    console.log('Server up and running ... ' + process.env.APP_PORT)
+const port = 5000
+app.listen(port, () => {
+    console.log('Server up and running ... ' + port)
 });
