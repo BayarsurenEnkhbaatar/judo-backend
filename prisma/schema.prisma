@@ -9,7 +9,9 @@ datasource db {
   provider = "mysql"
   url      = "mysql://admin:20010310JUdo*-+@judodb.crpujfw3miu6.ap-southeast-1.rds.amazonaws.com:3306/judodb"
 }
-
+// mysql://root:@localhost:3306/judo
+// mysql://admin:20010310JUdo*-+@judodb.crpujfw3miu6.ap-southeast-1.rds.amazonaws.com:3306/judodb
+//  url      = "mysql://root:@localhost:3306/judo"
 
 model Category {
   id Int @id @default(autoincrement())

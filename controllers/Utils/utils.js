@@ -18,7 +18,8 @@ export const imageUpload = async (req, res) => {
     res.status(200).json(`/upload/user-uploads/image-${key}`);
     
   } catch (error) {
-    res.status(500).json(error);
+    console.log(error);
+    res.status(500);
   }
 };
 

@@ -107,7 +107,7 @@ export const getAthleteStatus = async (req, res) => {
     }
 
     export const createAthlete = async (req, res) => {
-        const { username, lastname, gender, birth_date, phone_no, register_no, token, document_img, profile_img } = req.body;
+        const { username, lastname, gender, birth_date, phone_no, register_no, token, document_img, profile_img, status } = req.body;
         jwt.verify(token, authjwt, async function(err, decoded){
             if(err) return res.status(444).json("Not auth");
                 try {
@@ -122,7 +122,8 @@ export const getAthleteStatus = async (req, res) => {
                             org_id: decoded.id,
                             document_img: document_img,
                             profile_img: profile_img,
-                            status:STATUS.REQUESTED
+                            status:status
+                            // status:STATUS.REQUESTED
                         }
                     });
 
