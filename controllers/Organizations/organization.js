@@ -174,7 +174,8 @@ export const OrgExpiredApproved = async (req, res) => {
             return res.status(200).json({ msg: "Таны нэр эсвэл имейл хаяг аль хэдийн бүртгэлтэй байна !" });
         }
 
-        const date = new Date("2023-01-01")
+        var date = new Date().toISOString();
+        date.setFullYear(oneYearFromNow.getFullMonth() - 1);
     
         // Create the organization
         const response = await prisma.organization.create({
