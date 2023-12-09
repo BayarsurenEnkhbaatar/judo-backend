@@ -188,7 +188,7 @@ export const createAthlete = async (req, res) => {
                         org_id: decoded.id,
                         document_img: document_img,
                         profile_img: profile_img,
-                        expiry_date: new Date('2023-01-01'),
+                        expiry_date: new Date("2023-01-01").toISOString(),
                         status:status
                         // status:STATUS.REQUESTED
                     }

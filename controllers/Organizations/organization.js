@@ -106,7 +106,7 @@ export const getOrgExpired = async (req, res) => {
 };
 export const OrgExpiredApproved = async (req, res) => {
     const {id} = req.body;
-    var oneYearFromNow = new Date();
+    var oneYearFromNow = new Date().toISOString();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
     try {
 
@@ -188,7 +188,7 @@ export const OrgExpiredApproved = async (req, res) => {
             province:province,
             sum:sum,
             logo: logo,
-            expiry_date: new Date('2023-01-01')
+            expiry_date: new Date("2023-01-01").toISOString()
             }
         });
     
