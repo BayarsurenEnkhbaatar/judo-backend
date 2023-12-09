@@ -51,7 +51,6 @@ model Organization {
   athletes    Athlete[]
   athlete_to_comptation Athlete_to_comptation[]
   comp_to_org Comptation_to_Organization[]
-
 }
 
 model Athlete {

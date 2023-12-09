@@ -104,9 +104,8 @@ export const getAthleteExpired = async (req, res) => {
 };
 
 export const OrgExpiredApproved = async (req, res) => {
-    const {id} = req.body;
-    var oneYearFromNow = new Date();
-    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    const {id, date} = req.body;
+
     try {
 
         const org = await prisma.athlete.update({
@@ -114,7 +113,7 @@ export const OrgExpiredApproved = async (req, res) => {
                 id: Number(id)
             },
             data:{
-                expiry_date: oneYearFromNow
+                expiry_date: date
             }
         });
 
@@ -177,6 +176,10 @@ export const createAthlete = async (req, res) => {
     jwt.verify(token, authjwt, async function(err, decoded){
         if(err) return res.status(444).json("Not auth");
             try {
+                var date = new Date();
+                date.setMonth(date.getMonth() - 1);
+                var isoDate = date.toISOString();
+
                 const response = await prisma.athlete.create({
                     data: {
                         username: username,
@@ -188,7 +191,7 @@ export const createAthlete = async (req, res) => {
                         org_id: decoded.id,
                         document_img: document_img,
                         profile_img: profile_img,
-                        expiry_date: new Date("2023-01-01").toISOString(),
+                        expiry_date: isoDate,
                         status:status
                         // status:STATUS.REQUESTED
                     }

@@ -105,9 +105,7 @@ export const getOrgExpired = async (req, res) => {
     }
 };
 export const OrgExpiredApproved = async (req, res) => {
-    const {id} = req.body;
-    var oneYearFromNow = new Date().toISOString();
-    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    const {id, date} = req.body;
     try {
 
         const org = await prisma.organization.update({
@@ -115,7 +113,7 @@ export const OrgExpiredApproved = async (req, res) => {
                 id: Number(id)
             },
             data:{
-                expiry_date: oneYearFromNow
+                expiry_date: date
             }
         });
 
