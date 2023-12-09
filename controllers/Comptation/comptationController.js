@@ -2,7 +2,7 @@ import {PrismaClient} from "@prisma/client";
 const prisma = new PrismaClient();
 import jwt from "jsonwebtoken";
 import {authjwt} from "../../utils/keys.js"
-import { STATUS } from "../Utils/types.js";
+import { GENDER, STATUS } from "../Utils/types.js";
 
 export const createComptation = async (req, res) => {
     const {name, desc, province, sum, start_date, end_date, orgenizer, cover_img, categorys, mandat_price, more_address, type} = req.body;
@@ -100,6 +100,33 @@ export const compFindId = async (req, res) => {
                 id: parseInt(req.query.id),
             }
         });
+        // const org = await prisma.comptation_to_Organization.count({
+        //     where:{
+        //         comp_id: parseInt(req.query.id),
+        //     }
+        // });
+        // const athmale = await prisma.athlete_to_comptation.findMany({
+        //     where: {
+        //       comp_id: parseInt(req.query.id),
+        //     },
+        //     include: {
+        //         athlete: true,
+        //     },
+        //   });
+        // // const athfemale = await prisma.athlete_to_comptation.count({
+        // //     where: {
+        // //       comp_id: parseInt(req.query.id),
+        // //     },
+        // //     include: {
+        // //       athlete: {
+        // //         where: {
+        // //           gender: GENDER.FEMALE,
+        // //         },
+        // //       },
+        // //     },
+        // //   });
+
+        // console.log(athmale);
         res.status(200).json(response);
     }catch(error){
         res.status(404).json({msg: error.message});
@@ -165,7 +192,7 @@ export const createAthleteToComptation = async (req, res) => {
                     org_id: parseInt(decoded.id),
                     comp_id: parseInt(comp_id),
                     category_id: parseInt(category_id),
-                    kg:kg
+                    kg:kg,
                 },
                 include:{
                     athlete: true,

@@ -7,7 +7,11 @@ import {authjwt} from '../../utils/keys.js'
 
 export const getOrg = async (req, res) => {
     try{
-        const response = await prisma.organization.findMany();
+        const response = await prisma.organization.findMany({
+            where:{
+                status: STATUS.APPROVED
+            }
+        });
         res.status(200).json(response);
     }catch(error){
         res.status(404).json({msg: error.message});
@@ -51,6 +55,71 @@ export const getOrgStatus = async (req, res) => {
         };
 
         res.status(200).json(response);
+    } catch (error) {
+        res.status(404).json({ msg: error.message });
+    }
+};
+
+export const getOrgExpired = async (req, res) => {
+    const { limit, page, name } = req.query;
+    const offset = (page - 1) * limit;
+    try {
+        let whereClause = {
+            status: STATUS.APPROVED,
+            expiry_date: {
+                lt: new Date()
+            },
+        };
+
+        if (name) {
+            whereClause.name = {
+                contains: name
+            };
+        }
+
+        const alldata = await prisma.organization.findMany({
+            where: whereClause,
+            orderBy: {
+                id: 'desc'
+            },
+            take: parseInt(limit),
+            skip: offset
+        });
+
+        const count = await prisma.organization.count({
+            where: whereClause
+        });
+
+        const totalPage = Math.ceil(count / limit);
+        const response = {
+            data: alldata,
+            page: +page,
+            limit: +limit,
+            all: count,
+            totalPage
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(404).json({ msg: error.message });
+    }
+};
+export const OrgExpiredApproved = async (req, res) => {
+    const {id} = req.body;
+    var oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    try {
+
+        const org = await prisma.organization.update({
+            where:{
+                id: Number(id)
+            },
+            data:{
+                expiry_date: oneYearFromNow
+            }
+        });
+
+        res.status(200).json("Амжилттай сунгалаа");
     } catch (error) {
         res.status(404).json({ msg: error.message });
     }
@@ -118,7 +187,8 @@ export const getOrgStatus = async (req, res) => {
             created_date: created_date,
             province:province,
             sum:sum,
-            logo: logo
+            logo: logo,
+            expiry_date: new Date('2023-01-01')
             }
         });
     
@@ -202,6 +272,9 @@ export const getOrgAthleteGender = async (req, res) => {
                         org_id: Number(decoded.id),
                         gender: gender,
                         status: STATUS.APPROVED,
+                        expiry_date: {
+                            gt: new Date()
+                        },
                         username: {
                             contains: name
                         }
@@ -218,6 +291,9 @@ export const getOrgAthleteGender = async (req, res) => {
                         org_id: Number(decoded.id),
                         gender: gender,
                         status: STATUS.APPROVED,
+                        expiry_date: {
+                            gt: new Date()
+                        }
                     }
                 });
                 res.status(200).json(response);

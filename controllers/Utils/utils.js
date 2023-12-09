@@ -3,23 +3,28 @@ import axios from 'axios'
 import { getObjectURL } from "../../s3/index.js";
 
 export const imageUpload = async (req, res) => {
-  const {file} = req;
-  const key = Date.now()+file.originalname;
-  const url = await putObject(`image-${key}`, file.mimetype);
+  const { file } = req;
+
+  // Generate a unique key using a combination of a unique identifier and the original filename
+  const key = `${Date.now()}-${file.originalname}`;
 
   try {
-    const ress = await axios.put(url, file.buffer, {
+    const url = await putObject(`image-${key}`, file.mimetype);
+
+    const response = await axios.put(url, file.buffer, {
       headers: {
         'Content-Type': file.mimetype
       }
     });
 
-    // const uri = await getObjectURL(`/upload/user-uploads/image-${key}`);
-    res.status(200).json(`/upload/user-uploads/image-${key}`);
-    
+    if (response.status === 200) {
+      res.status(200).json(`/upload/user-uploads/image-${key}`);
+    } else {
+      res.status(500).json({ error: 'Image upload failed.' });
+    }
   } catch (error) {
-    console.log(error);
-    res.status(500);
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 };
 

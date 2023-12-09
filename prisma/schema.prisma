@@ -37,6 +37,7 @@ model Organization {
   name        String?
   created_date String?
   description String?
+  expiry_date DateTime?
   phone_no    String?
   email       String?
   logo        String?
@@ -64,6 +65,7 @@ model Athlete {
   profile_img    String? @db.Text
   document_img   String? @db.Text
   created_at     DateTime?
+  expiry_date     DateTime?
   status         String?
   type           String?
   org_id         Int
