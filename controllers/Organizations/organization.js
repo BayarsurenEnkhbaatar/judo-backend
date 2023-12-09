@@ -175,7 +175,7 @@ export const OrgExpiredApproved = async (req, res) => {
         }
 
         var date = new Date().toISOString();
-        date.setFullYear(oneYearFromNow.getFullMonth() - 1);
+        date.setFullYear(date.getFullMonth() - 1);
     
         // Create the organization
         const response = await prisma.organization.create({
