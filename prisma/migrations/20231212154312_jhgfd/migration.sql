@@ -120,12 +120,12 @@ CREATE TABLE `Matches` (
 -- CreateTable
 CREATE TABLE `Results` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `round` INTEGER NULL,
-    `match_number` INTEGER NULL,
-    `group` VARCHAR(191) NULL,
+    `medal` VARCHAR(191) NULL,
     `kg` VARCHAR(191) NULL,
+    `number` INTEGER NULL,
     `comp_id` INTEGER NOT NULL,
-    `winner_id` INTEGER NOT NULL,
+    `athlete_id` INTEGER NOT NULL,
+    `org_id` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -213,10 +213,13 @@ ALTER TABLE `Matches` ADD CONSTRAINT `Matches_athlete2_id_fkey` FOREIGN KEY (`at
 ALTER TABLE `Matches` ADD CONSTRAINT `Matches_comp_id_fkey` FOREIGN KEY (`comp_id`) REFERENCES `Comptation`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Results` ADD CONSTRAINT `Results_winner_id_fkey` FOREIGN KEY (`winner_id`) REFERENCES `Athlete`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Results` ADD CONSTRAINT `Results_athlete_id_fkey` FOREIGN KEY (`athlete_id`) REFERENCES `Athlete`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Results` ADD CONSTRAINT `Results_comp_id_fkey` FOREIGN KEY (`comp_id`) REFERENCES `Comptation`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Results` ADD CONSTRAINT `Results_org_id_fkey` FOREIGN KEY (`org_id`) REFERENCES `Organization`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Groups` ADD CONSTRAINT `Groups_comp_id_fkey` FOREIGN KEY (`comp_id`) REFERENCES `Comptation`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
