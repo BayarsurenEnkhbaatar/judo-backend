@@ -13,3 +13,9 @@ export const STATUS = {
     DECLINED: "DECLINED",
     PENDING: "PENDING"
 }
+
+export const MEDAL = {
+    GOLD: "GOLD",
+    SILVER: "SILVER",
+    BRONZE: "BRONZE"
+}

@@ -26,3 +26,9 @@ export const GENDER = {
     MALE: "MALE",
     FEMALE: "FEMALE",
 }
+
+export const MEDAL = {
+    GOLD: "GOLD",
+    SILVER: "SILVER",
+    BRONZE: "BRONZE"
+}

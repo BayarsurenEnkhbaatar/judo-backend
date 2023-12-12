@@ -2,7 +2,7 @@ import {PrismaClient} from "@prisma/client";
 const prisma = new PrismaClient();
 import jwt from "jsonwebtoken";
 import {authjwt} from "../../utils/keys.js"
-import { GENDER, STATUS } from "../Utils/types.js";
+import { GENDER, MEDAL, STATUS } from "../Utils/types.js";
 
 export const createComptation = async (req, res) => {
     const {name, desc, province, sum, start_date, end_date, orgenizer, cover_img, categorys, mandat_price, more_address, type} = req.body;
@@ -135,7 +135,7 @@ export const compFindId = async (req, res) => {
 
 
 //athlete to comptation
-export const createAthleteToComptation = async (req, res) => {
+  export const createAthleteToComptation = async (req, res) => {
     const { token, athlete_ids, kg, comp_id, category_id } = req.body;
   
     jwt.verify(token, authjwt, async function(err, decoded) {
@@ -180,7 +180,7 @@ export const createAthleteToComptation = async (req, res) => {
   };
 
 
-  export const compToCategoryAthletesAndOrg = async (req, res) => {
+    export const compToCategoryAthletesAndOrg = async (req, res) => {
       const {org_id, comp_id, category_id, kg} = req.query;
 
       jwt.verify(org_id, authjwt, async function(err, decoded) {
@@ -229,7 +229,7 @@ export const createAthleteToComptation = async (req, res) => {
           }
   
         });
-      }
+    }
 
     export const AdminCompAthlete = async (req, res) => {
     const {comp_id, kg} = req.query;
@@ -355,3 +355,225 @@ export const createAthleteToComptation = async (req, res) => {
             }
         }
     }
+
+    export const Comp_Stattistik = async (req, res) => {
+        const { comp_id } = req.query;
+      
+        try {
+          const response = await prisma.athlete_to_comptation.count({
+            where: {
+              comp_id: parseInt(comp_id),
+            },
+          });
+      
+          const categories = await prisma.comp_to_category.findMany({
+            where: {
+              comp_id: parseInt(comp_id),
+            },
+          });
+      
+          let categoryData = [];
+      
+          // Batch queries to fetch all jin items for each category
+          await Promise.all(
+            categories.map(async (category) => {
+              const jin = await prisma.jin.findMany({
+                where: {
+                  category_id: category.id,
+                },
+              });
+      
+              categoryData.push({
+                category,
+                items: jin,
+              });
+            })
+          );
+      
+          let jins = [];
+      
+          // Batch queries to count athletes for each jin item
+          await Promise.all(
+            categoryData.map(async (categoryEntry) => {
+              await Promise.all(
+                categoryEntry.items.map(async (jinItem) => {
+                  const jinCount = await prisma.athlete_to_comptation.count({
+                    where: {
+                      comp_id: parseInt(comp_id),
+                      kg: jinItem.kg,
+                      status: STATUS.APPROVED
+                    },
+                  });
+
+                  const cat = await prisma.category.findFirst({
+                    where: {
+                      id: parseInt(categoryEntry.category.id),
+                    },
+                  });
+      
+                  jins.push({
+                    jin: jinItem,
+                    number: jinCount,
+                    gender: cat.gender,
+                  });
+                })
+              );
+            })
+          );
+
+          const maleJins = jins
+          .filter((jin) => jin.gender === 'MALE')
+          .sort((a, b) => b.jin.kg - a.jin.kg);
+        
+        const femaleJins = jins
+          .filter((jin) => jin.gender === 'FEMALE')
+          .sort((a, b) => b.jin.kg - a.jin.kg);
+        
+      
+          res.status(200).json({ maleJins, femaleJins });
+        } catch (error) {
+          res.status(404).json({ msg: error.message });
+        }
+    };
+      
+    // export const Comp_Medal_Chanar = async (req, res) => {
+    //   const { comp_id } = req.query;
+    
+    //   try {
+    //     // Get the counts for each medal type and organization
+    //     const medalCounts = await prisma.results.groupBy({
+    //       by: ['org_id', 'medal'],
+    //       _count: {
+    //         id: true
+    //       },
+    //       where: {
+    //         comp_id: parseInt(comp_id),
+    //       },
+    //     });
+    
+    //     const medalCountsByOrg = {};
+    //     for (const medalCount of medalCounts) {
+    //       const orgId = medalCount.org_id;
+    //       const medal = medalCount.medal;
+    //       const count = medalCount._count.id;
+    
+    //       if (!medalCountsByOrg[orgId]) {
+    //         medalCountsByOrg[orgId] = { orgId, gold: 0, silver: 0, bronze: 0 };
+    //       }
+    
+    //       switch (medal) {
+    //         case MEDAL.GOLD:
+    //           medalCountsByOrg[orgId].gold += count;
+    //           break;
+    //         case MEDAL.SILVER:
+    //           medalCountsByOrg[orgId].silver += count;
+    //           break;
+    //         case MEDAL.BRONZE:
+    //           medalCountsByOrg[orgId].bronze += count;
+    //           break;
+    //       }
+    //     }
+    
+    //     // Convert the object to an array of values
+    //     const medalCountsArray = Object.values(medalCountsByOrg);
+    
+    //     // Sort organizations based on the number of gold, silver, and bronze medals
+    //     const sortedOrgs = medalCountsArray.sort((a, b) => {
+    //       // Rank by gold count in descending order
+    //       if (b.gold !== a.gold) {
+    //         return b.gold - a.gold;
+    //       }
+    //       // Rank by silver count in descending order if gold counts are equal
+    //       if (b.silver !== a.silver) {
+    //         return b.silver - a.silver;
+    //       }
+    //       // Rank by bronze count in descending order if gold and silver counts are equal
+    //       return b.bronze - a.bronze;
+    //     });
+    
+    //     res.status(200).json(sortedOrgs);
+    
+    //   } catch (error) {
+    //     console.error("Error:", error);
+    //     res.status(404).json({ msg: error.message });
+    //   }
+    // };
+    
+    export const Comp_Medal_Chanar = async (req, res) => {
+      const { comp_id } = req.query;
+    
+      try {
+        // Get the counts for each medal type and organization
+        const medalCounts = await prisma.results.groupBy({
+          by: ['org_id', 'medal'],
+          _count: {
+            id: true,
+          },
+          where: {
+            comp_id: parseInt(comp_id),
+          },
+        });
+    
+        const medalCountsByOrg = {};
+        for (const medalCount of medalCounts) {
+          const orgId = medalCount.org_id;
+          const medal = medalCount.medal;
+          const count = medalCount._count.id;
+    
+          if (!medalCountsByOrg[orgId]) {
+            medalCountsByOrg[orgId] = { orgId, gold: 0, silver: 0, bronze: 0 };
+          }
+    
+          switch (medal) {
+            case MEDAL.GOLD:
+              medalCountsByOrg[orgId].gold += count;
+              break;
+            case MEDAL.SILVER:
+              medalCountsByOrg[orgId].silver += count;
+              break;
+            case MEDAL.BRONZE:
+              medalCountsByOrg[orgId].bronze += count;
+              break;
+          }
+        }
+    
+        // Convert the object to an array of values
+        const medalCountsArray = Object.values(medalCountsByOrg);
+    
+        // Fetch organization details based on orgId
+        const orgsDetails = await prisma.organization.findMany({
+          where: {
+            id: {
+              in: medalCountsArray.map((org) => org.orgId),
+            },
+          },
+        });
+    
+        // Combine organization details with medal counts
+        const orgsWithMedals = medalCountsArray.map((medalCount) => {
+          const orgDetails = orgsDetails.find((org) => org.id === medalCount.orgId);
+          return { ...medalCount, ...orgDetails };
+        });
+    
+        // Sort organizations based on the number of gold, silver, and bronze medals
+        const sortedOrgs = orgsWithMedals.sort((a, b) => {
+          // Rank by gold count in descending order
+          if (b.gold !== a.gold) {
+            return b.gold - a.gold;
+          }
+          // Rank by silver count in descending order if gold counts are equal
+          if (b.silver !== a.silver) {
+            return b.silver - a.silver;
+          }
+          // Rank by bronze count in descending order if gold and silver counts are equal
+          return b.bronze - a.bronze;
+        });
+    
+        res.status(200).json(sortedOrgs);
+    
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(404).json({ msg: error.message });
+      }
+    };
+    

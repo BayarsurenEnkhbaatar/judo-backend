@@ -9,6 +9,7 @@ datasource db {
   provider = "mysql"
   url      = "mysql://admin:20010310JUdo*-+@judodb.crpujfw3miu6.ap-southeast-1.rds.amazonaws.com:3306/judodb"
 }
+
 // mysql://root:@localhost:3306/judo
 // mysql://admin:20010310JUdo*-+@judodb.crpujfw3miu6.ap-southeast-1.rds.amazonaws.com:3306/judodb
 //  url      = "mysql://root:@localhost:3306/judo"
@@ -49,6 +50,7 @@ model Organization {
   province    String?
   sum         String?
   athletes    Athlete[]
+  results     Results[]
   athlete_to_comptation Athlete_to_comptation[]
   comp_to_org Comptation_to_Organization[]
 }
@@ -139,7 +141,6 @@ model Matches {
   comp_id         Int
   athlete1_id     Int
   athlete2_id     Int
-
   athlete1        Athlete    @relation("MatchesPlayer1", fields: [athlete1_id], references: [id])
   athlete2        Athlete    @relation("MatchesPlayer2", fields: [athlete2_id], references: [id])
   comptation      Comptation @relation(fields: [comp_id], references: [id])
@@ -147,14 +148,15 @@ model Matches {
 
 model Results {
   id              Int        @id @default(autoincrement())
-  round           Int?
-  match_number    Int?
-  group           String?
+  medal           String?
   kg              String?
+  number          Int?
   comp_id         Int
-  winner_id     Int
-  winnerid      Athlete @relation(fields: [winner_id], references: [id])
+  athlete_id      Int
+  org_id          Int
+  athlete         Athlete @relation(fields: [athlete_id], references: [id])
   comptation      Comptation @relation(fields: [comp_id], references: [id])
+  oganization      Organization @relation(fields: [org_id], references: [id])
 }
 
 model Groups {

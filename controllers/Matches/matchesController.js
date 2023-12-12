@@ -1,5 +1,6 @@
 import {PrismaClient} from "@prisma/client";
 import { createFinal, createRepechage } from "../FinalAndRepechage/repeAndFinalController.js";
+import { MEDAL } from "../Utils/types.js";
 const prisma = new PrismaClient();
 
 export const MatchCreate = async (req, res) => {
@@ -150,7 +151,8 @@ export const MatchCompGet = async (req, res) => {
 
         return res.status(200).json(response);
     } catch (err) {
-        return res.status(500).json('Internal server error');
+        console.log(err);
+        return res.status(500).json(err);
     }
 };
 
@@ -225,6 +227,71 @@ export const MatchWinnerRepechage = async (req, res) => {
                     data: athlete_data
                 });
             }
+
+            if(data.match_number === 1){
+                const bronze = await prisma.results.findFirst({
+                    where: {
+                        comp_id: Number(data.comp_id),
+                        kg: data.kg,
+                        number: 1,
+                        medal: MEDAL.BRONZE
+                    }
+                });
+                if(bronze){
+                    const bronzes = await prisma.results.update({
+                        where:{
+                            id: bronze.id
+                        },
+                        data: {
+                            athlete_id: Number(el.id),
+                            org_id: Number(el.org_id),
+                        }
+                    });
+                }else{
+                    const bronzes = await prisma.results.create({
+                        data: {
+                            athlete_id: Number(el.id),
+                            org_id: Number(el.org_id),
+                            comp_id: Number(data.comp_id),
+                            kg: data.kg,
+                            number: 1,
+                            medal: MEDAL.BRONZE
+                        }
+                    });
+                }
+            }
+
+            const bronze = await prisma.results.findFirst({
+                where: {
+                    comp_id: Number(data.comp_id),
+                    kg: data.kg,
+                    number: updateData.match_number,
+                    medal: MEDAL.BRONZE
+                }
+            });
+            if(bronze){
+                const bronzes = await prisma.results.update({
+                    where:{
+                        id: bronze.id
+                    },
+                    data: {
+                        athlete_id: Number(el.id),
+                        org_id: Number(el.org_id),
+                    }
+                });
+            }else{
+                const bronzes = await prisma.results.create({
+                    data: {
+                        athlete_id: Number(el.id),
+                        org_id: Number(el.org_id),
+                        comp_id: Number(data.comp_id),
+                        kg: data.kg,
+                        number: updateData.match_number,
+                        medal: MEDAL.BRONZE
+                    }
+                });
+            }
+
             return res.status(200).json("response");
         } catch (err) {
             console.log(err);
@@ -345,6 +412,65 @@ export const MatchWunnerFinal = async (req, res) => {
                     data: athlete_data
                 });
             }
+
+            const silver = await prisma.results.findFirst({
+                where: {
+                    comp_id: Number(data.comp_id),
+                    kg: data.kg,
+                    medal: MEDAL.SILVER
+                }
+            });
+            if(silver){
+                const silvers = await prisma.results.update({
+                    where:{
+                        id: silver.id
+                    },
+                    data: {
+                        athlete_id: Number(lose.id),
+                        org_id: Number(lose.org_id),
+                    }
+                });
+            }else{
+                const silver = await prisma.results.create({
+                    data: {
+                        comp_id: Number(data.comp_id),
+                        athlete_id: Number(lose.id),
+                        org_id: Number(lose.org_id),
+                        kg: data.kg,
+                        medal: MEDAL.SILVER
+                    }
+                });
+            }
+
+            const gold = await prisma.results.findFirst({
+                where: {
+                    comp_id: Number(data.comp_id),
+                    kg: data.kg,
+                    medal: MEDAL.GOLD
+                }
+            });
+            if(gold){
+                const golds = await prisma.results.update({
+                    where:{
+                        id: gold.id
+                    },
+                    data: {
+                        athlete_id: Number(winner.id),
+                        org_id: Number(winner.org_id),
+                    }
+                });
+            }else{
+                const gold = await prisma.results.create({
+                    data: {
+                        comp_id: Number(data.comp_id),
+                        athlete_id: Number(winner.id),
+                        org_id: Number(winner.org_id),
+                        kg: data.kg,
+                        medal: MEDAL.GOLD
+                    }
+                });
+            }
+
             return res.status(200).json("response");
         } catch (err) {
             console.log(err);

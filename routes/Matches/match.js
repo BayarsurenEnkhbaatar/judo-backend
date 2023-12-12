@@ -5,7 +5,6 @@ import { MatchCompGet, MatchCreate, MatchRepechage, MatchUpdate, MatchWinner, Ma
 const router = express.Router();
 
 router.post('/matches/create', MatchCreate);
-
 router.get('/matches/draw', MatchCompGet);
 
 router.patch('/matches/draw/update', MatchUpdate);
