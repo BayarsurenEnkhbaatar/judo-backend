@@ -205,7 +205,6 @@ export const createAthlete = async (req, res) => {
     }
 )}
 
-
 export const updateAthleteStatus = async (req, res) => {
     const {status} = req.body;
 
