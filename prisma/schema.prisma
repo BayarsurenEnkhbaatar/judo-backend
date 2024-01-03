@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:@localhost:3306/judo"
+  url      = "mysql://admin:20010310JUdo*-+@judodb.crpujfw3miu6.ap-southeast-1.rds.amazonaws.com:3306/judodb"
 }
 
 // mysql://root:@localhost:3306/judo
@@ -93,6 +93,7 @@ model Comptation {
   end_date            DateTime?
   orgenizer           String?
   cover_img           String?
+  guide_doc           String?
   mandat_price        Int?
   more_address        String?
   type                String?
@@ -207,3 +208,9 @@ model Comptation_to_Organization {
   organization      Organization @relation(fields: [org_id], references: [id])
 }
 
+model Admins {
+  id              Int        @id @default(autoincrement())
+  username        String?
+  password        String?
+  type            String?
+}

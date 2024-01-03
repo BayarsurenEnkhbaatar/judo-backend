@@ -19,3 +19,10 @@ export const MEDAL = {
     SILVER: "SILVER",
     BRONZE: "BRONZE"
 }
+
+export const ADMIN = {
+    MANAGER: "MANAGER",
+    DIRECTOR: "DIRECTOR",
+    JIN: "JIN",
+    COMP_PLAY: "COMP_PLAY"
+}

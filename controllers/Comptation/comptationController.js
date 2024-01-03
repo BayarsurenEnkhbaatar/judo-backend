@@ -5,7 +5,7 @@ import {authjwt} from "../../utils/keys.js"
 import { GENDER, MEDAL, STATUS } from "../Utils/types.js";
 
 export const createComptation = async (req, res) => {
-    const {name, desc, province, sum, start_date, end_date, orgenizer, cover_img, categorys, mandat_price, more_address, type} = req.body;
+    const {name, desc, province, sum, start_date, end_date, orgenizer, cover_img, categorys, mandat_price, more_address, type, guide_doc} = req.body;
     const startdate = new Date(start_date);
     const enddate = new Date(end_date);
 
@@ -22,7 +22,8 @@ export const createComptation = async (req, res) => {
                 cover_img:cover_img,
                 mandat_price:parseInt(mandat_price),
                 more_address:more_address,
-                type:type
+                type:type,
+                guide_doc:guide_doc
             }
         });
         for(let i = 0; i<categorys.length; i++){

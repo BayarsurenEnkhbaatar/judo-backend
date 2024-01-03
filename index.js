@@ -12,6 +12,7 @@ import GroupRoute from "./routes/Groups/groups.js"
 import FinalAndRepechageRoute from "./routes/FinalAndRepechage/finalAndRepechage.js"
 import ComptoOrgRoute from "./routes/Organizations/comp_to_org.js"
 import UtilsRoute from "./routes/Utils/utils.js"
+import AdminRoute from "./routes/Admins/admin.js"
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use(GroupRoute);
 app.use(FinalAndRepechageRoute);
 app.use(ComptoOrgRoute);
 app.use(UtilsRoute);
+app.use(AdminRoute);
 
 const port = 5000
 app.listen(port, () => {
