@@ -188,8 +188,11 @@ export const pdfConvert = async (req, res) => {
 
     await browser.close();
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.send(pdfBuffer);
+    // res.setHeader('Content-Type', 'application/pdf');
+    // res.send(pdfBuffer);
+    const base64pdf = pdfBuffer.toString('base64');
+    res.send(base64pdf);
+    
   } catch (error) {
     console.error('Error generating PDF:', error);
     res.status(500).send('Internal Server Error');
