@@ -131,37 +131,6 @@ export const pdfConvert = async (req, res) => {
     const { comp_id, org_id } = req.body;
     const athleteData = await fetchDataFromDatabase(org_id, comp_id);
 
-    const dynamicData = [
-      {
-        athlete_name: 'Баярсүрэн',
-        athlete_lastname: 'Энхбаатар',
-        judo_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-        profile: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-        zb_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-        kg: '-34',
-        org_name: 'Genco',
-        comp_name: 'Undes',
-      },
-      {
-        athlete_name: 'Баярсүрэн',
-        athlete_lastname: 'Энхбаатар',
-        judo_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-        profile: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-        zb_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-        kg: '-34',
-        org_name: 'хил хамгаалах ерөнхий газар',
-        comp_name: 'Дашдоржийн нэрэмжит өвсөр үеийн тэмцээн хыххы хыхыхы хыхыхых хыхых',
-      },
-    ];
-
-    // const dynamicHtml = dynamicData.map((data) => {
-    //   return Object.keys(data).reduce(
-    //     (acc, key) => acc.replace(new RegExp(`{{${key}}}`, 'g'), data[key]),
-    //     mandatHtml
-    //   );
-    // }).join('');
-
-
     const dynamicHtml = mustache.render(mandatHtml, { athleteData });
 
     const browser = await puppeteer.launch({
@@ -191,7 +160,7 @@ export const pdfConvert = async (req, res) => {
     // res.setHeader('Content-Type', 'application/pdf');
     // res.send(pdfBuffer);
     const base64pdf = pdfBuffer.toString('base64');
-    res.send(base64pdf);
+    res.send(pdfBuffer);
     
   } catch (error) {
     console.error('Error generating PDF:', error);
