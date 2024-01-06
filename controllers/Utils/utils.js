@@ -133,9 +133,13 @@ export const pdfConvert = async (req, res) => {
 
     const dynamicHtml = mustache.render(mandatHtml, { athleteData });
 
+    // const browser = await puppeteer.launch({
+    //   headless: true,
+    // });
     const browser = await puppeteer.launch({
-      headless: 'new',
-    });
+      executablePath: '/usr/bin/chromium-browser'
+    })
+
     const page = await browser.newPage();
 
     await page.setRequestInterception(true);
