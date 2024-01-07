@@ -183,7 +183,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
       },
     });
 
-    // const img = await imageGetProfile(response[0].comptation.orgenizer_logo);
+    const img = await imageGetProfile(response[0].comptation.orgenizer_logo);
 
     const signedUrls = await Promise.all(response.map(async (item) => {
       const profileUrl = await imageGetProfile(item.athlete.profile_img);
@@ -193,7 +193,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
         athlete_lastname: item.athlete.lastname,
         judo_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
         profile: profileUrl,
-        zb_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
+        zb_logo: img,
         kg: item.kg,
         org_name: item.organization.name,
         comp_name: item.comptation.name,
