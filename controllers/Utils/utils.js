@@ -181,12 +181,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
         comptation: true,
       },
     });
-
-    // const imageGetProfile1 = async (key) => {
-    //   const url = await getObjectURL(key);
-    //   return url
-    // };
-
+    
     const img = await getObjectURL(response[0].comptation.orgenizer_logo);
 
     const signedUrls = await Promise.all(response.map(async (item) => {
