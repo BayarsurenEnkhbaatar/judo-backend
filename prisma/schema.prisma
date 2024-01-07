@@ -92,7 +92,9 @@ model Comptation {
   start_date          DateTime?
   end_date            DateTime?
   orgenizer           String?
+  orgenizer_logo      String?
   cover_img           String?
+  deadline            DateTime?
   guide_doc           String?
   mandat_price        Int?
   more_address        String?

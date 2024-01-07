@@ -5,9 +5,10 @@ import {authjwt} from "../../utils/keys.js"
 import { GENDER, MEDAL, STATUS } from "../Utils/types.js";
 
 export const createComptation = async (req, res) => {
-    const {name, desc, province, sum, start_date, end_date, orgenizer, cover_img, categorys, mandat_price, more_address, type, guide_doc} = req.body;
+    const {name, desc, province, sum, start_date, end_date, orgenizer, cover_img, categorys, mandat_price, more_address, type, guide_doc, deadline, orgenizer_logo} = req.body;
     const startdate = new Date(start_date);
     const enddate = new Date(end_date);
+    const dead_line = new Date(deadline);
 
     try{
         const response = await prisma.comptation.create({
@@ -23,7 +24,9 @@ export const createComptation = async (req, res) => {
                 mandat_price:parseInt(mandat_price),
                 more_address:more_address,
                 type:type,
-                guide_doc:guide_doc
+                deadline:dead_line,
+                guide_doc:guide_doc,
+                orgenizer_logo:orgenizer_logo
             }
         });
         for(let i = 0; i<categorys.length; i++){
@@ -87,7 +90,11 @@ export const getCompAll = async (req, res) => {
 
 export const compAllList = async (req, res) => {
     try{
-        const response = await prisma.comptation.findMany();
+        const response = await prisma.comptation.findMany({
+          orderBy: {
+            start_date: 'asc',
+          },
+        });
         res.status(200).json(response);
     }catch(error){
         res.status(404).json({msg: error.message});
@@ -578,3 +585,33 @@ export const compFindId = async (req, res) => {
       }
     };
     
+
+    export const Comp_Edit = async (req, res) => {
+      const {name, id, start_date, end_date, more_address, orgenizer, mandat_price, province, sum} = req.body;
+      const startdate = new Date(start_date);
+      const enddate = new Date(end_date);
+
+      try{
+        const response = await prisma.comptation.update({
+            where:{
+                id: parseInt(id),
+            },
+            data:{
+                name: name,
+                start_date: startdate,
+                end_date: enddate,
+                more_address: more_address,
+                orgenizer: orgenizer,
+                mandat_price: mandat_price,
+                province: province,
+                sum: sum,
+            }
+        });
+        return res.status(200).json('Амжилттай')
+      } catch(error){
+        console.log(error);
+        return(500).json(error);
+      }
+
+
+    }

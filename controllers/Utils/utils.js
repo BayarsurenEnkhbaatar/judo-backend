@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import puppeteer from 'puppeteer';
 import mustache from 'mustache';
 import {PrismaClient} from "@prisma/client";
+import { STATUS } from "../../utils/types.js";
 const prisma = new PrismaClient();
 
 
@@ -133,13 +134,10 @@ export const pdfConvert = async (req, res) => {
 
     const dynamicHtml = mustache.render(mandatHtml, { athleteData });
 
-    // const browser = await puppeteer.launch({
-    //   headless: true,
-    // });
     const browser = await puppeteer.launch({
-      executablePath: '/usr/bin/chromium-browser'
-    })
-
+      headless: "new",
+    });
+    
     const page = await browser.newPage();
 
     await page.setRequestInterception(true);
@@ -164,7 +162,7 @@ export const pdfConvert = async (req, res) => {
     // res.setHeader('Content-Type', 'application/pdf');
     // res.send(pdfBuffer);
     const base64pdf = pdfBuffer.toString('base64');
-    res.send(pdfBuffer);
+    res.send(base64pdf);
     
   } catch (error) {
     console.error('Error generating PDF:', error);
@@ -185,6 +183,9 @@ const fetchDataFromDatabase = async (orgId, compId) => {
         comptation: true,
       },
     });
+
+    const img = await imageGetProfile(response[0].comptation.orgenizer_logo);
+
     const signedUrls = await Promise.all(response.map(async (item) => {
       const profileUrl = await imageGetProfile(item.athlete.profile_img);
       
@@ -193,25 +194,13 @@ const fetchDataFromDatabase = async (orgId, compId) => {
         athlete_lastname: item.athlete.lastname,
         judo_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
         profile: profileUrl,
-        zb_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
+        zb_logo: img,
         kg: item.kg,
         org_name: item.organization.name,
         comp_name: item.comptation.name,
       };
     }));
     return signedUrls
-
-    // return response.map((item) => ({
-    //   athlete_name: item.athlete.username,
-    //   athlete_lastname: item.athlete.lastname,
-    //   judo_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-    //   profile: profileUrl,
-    //   zb_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
-    //   kg: item.kg,
-    //   org_name: item.organization.name,
-    //   comp_name: item.comptation.name,
-    // }));
-
   } catch (error) {
     console.error('Error generating PDF:', error);
     res.status(500).send('Internal Server Error');
@@ -232,7 +221,6 @@ export const imageGet = async (req, res) => {
 export const imageUpload = async (req, res) => {
   const { file } = req;
 
-  // Generate a unique key using a combination of a unique identifier and the original filename
   const key = `${Date.now()}-${file.originalname}`;
 
   try {
@@ -252,5 +240,246 @@ export const imageUpload = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+
+export const imageUpload1 = async (file) => {
+
+  const key = `${Date.now()}-${file.originalname}`;
+
+  try {
+    const url = await putObject(`image-${key}`, file.mimetype);
+
+    const response = await axios.put(url, file.buffer, {
+      headers: {
+        'Content-Type': file.mimetype
+      }
+    });
+
+    if (response.status === 200) {
+      // res.status(200).json(`/upload/user-uploads/image-${key}`);
+      return `/upload/user-uploads/image-${key}`
+    } else {
+      res.status(500).json({ error: 'Image upload failed.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+
+
+export const Jin_Protocol_Pdf = async (req, res) => {
+  const mandatHtml = `
+  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    @page {
+        size: A4;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0; /* Remove default margin for accurate A4 size */
+    }
+
+    .container {
+        padding: 2rem;
+        font-family: 'Roboto', sans-serif;
+        max-width: 21cm; /* Set the maximum width to A4 width */
+        margin: auto; /* Center the content on the page */
+    }
+
+        .weigh-in-box {
+            background-color: #a7f3cf;
+            border: 2px solid #718096;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .weight {
+            font-weight: bold;
+            text-align: center;
+            font-size: 3rem;
+            margin-top: 0.5rem;
+        }
+        
+          .weight-1 {
+            font-weight: bold;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-top: 0.5rem;
+            color: #a7f3cf;
+        }
+
+        .title {
+            font-weight: bold;
+            text-align: center;
+            font-size: 2.4rem;
+        }
+          .title-1 {
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .table-container {
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #cbd5e0;
+        }
+
+        th,
+        td {
+            border: 1px solid #cbd5e0;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        th {
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+
+        td {
+            font-size: 0.75rem;
+        }
+        td.text-wrap {
+            max-width: 40rem; /* Set the maximum width as needed */
+            word-wrap: break-word;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="weigh-in-box">
+            <div class="header">
+                <h1 class="weight-1">${req.body.jin} kg</h1>
+                <div>
+                    <h1 class="title">Weigh-in-List</h1>
+                    <h1 class="title-1">{{comp_name}}</h1>
+                </div>
+                <h1 class="weight">${req.body.jin} кг</h1>
+            </div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Клуб</th>
+                        <th>Овог</th>
+                        <th>Нэр</th>
+                        <th>Төрсөн огноо</th>
+                        <th>Жин</th>
+                        <th>Гарын үсэг</th>
+                        <th>Out</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {{#athleteData}}
+                    <tr>
+                        <td>1</td>
+                        <td>{{org_name}}</td>
+                        <td class="text-wrap">{{athlete_lastname}}</td>
+                        <td>{{athlete_name}}</td>
+                        <td>{{birth_date}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                  {{/athleteData}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
+
+`;
+
+// <td>{{organization.name}}</td>
+//                         <td class="text-wrap">{{athlete.lastname}}</td>
+//                         <td>{{athlete.username}}</td>
+//                         <td>{{athlete.birth_date}}</td>
+  try {
+    const { comp_id, jin } = req.body;
+    const athleteData = await fJinDatabase(jin, comp_id);
+    const dynamicHtml = mustache.render(mandatHtml, { athleteData, comp_name: athleteData[0].comp_name });
+
+    const browser = await puppeteer.launch({
+      headless: "new",
+    });
+    
+    const page = await browser.newPage();
+
+    await page.setRequestInterception(true);
+
+    await page.setContent(dynamicHtml);
+
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+    });
+
+    await browser.close();
+    const base64pdf = pdfBuffer.toString('base64');
+    res.send(base64pdf);
+    
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).send(error);
+  }
+};
+
+
+const fJinDatabase = async (jin, comp_id) => {
+  try {
+    const response = await prisma.athlete_to_comptation.findMany({
+      where: {
+        kg: jin,
+        comp_id: Number(comp_id),
+        status: STATUS.PENDING
+      },
+      include: {
+        athlete: true,
+        organization: true,
+        comptation: true,
+      },
+    });
+
+    const signedUrls = await Promise.all(response.map(async (item) => {
+      const age = `${new Date(item.athlete.birth_date).getFullYear()}/${new Date(item.athlete.birth_date).getMonth() + 1}/${new Date(item.athlete.birth_date).getDate()}`;
+      return {
+        athlete_name: item.athlete.username,
+        athlete_lastname: item.athlete.lastname,
+        org_name: item.organization.name,
+        comp_name: item.comptation.name,
+        birth_date: age,
+      };
+    }));
+
+    return signedUrls
+  } catch (error) {
+    console.error('Error generating PDF:', error);
   }
 };
