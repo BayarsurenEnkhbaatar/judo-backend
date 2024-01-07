@@ -182,15 +182,15 @@ const fetchDataFromDatabase = async (orgId, compId) => {
       },
     });
 
-    const imageGetProfile1 = async (key) => {
-      const url = await getObjectURL(key);
-      return url
-    };
+    // const imageGetProfile1 = async (key) => {
+    //   const url = await getObjectURL(key);
+    //   return url
+    // };
 
-    const img = await imageGetProfile1(response[0].comptation.orgenizer_logo);
+    const img = await getObjectURL(response[0].comptation.orgenizer_logo);
 
     const signedUrls = await Promise.all(response.map(async (item) => {
-      const profileUrl = await imageGetProfile1(item.athlete.profile_img);
+      const profileUrl = await getObjectURL(item.athlete.profile_img);
       
       return {
         athlete_name: item.athlete.username,
