@@ -11,7 +11,6 @@ const s3Client = new S3Client({
 });
 
 export async function getObjectURL(key){
-    console.log(key, "key >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     const command = new GetObjectCommand({
         Bucket: "private-judo-backet",
         Key: key,

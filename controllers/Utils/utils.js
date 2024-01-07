@@ -181,8 +181,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
         comptation: true,
       },
     });
-    console.log(response)
-    
+
     const img = await getObjectURL(response[0].comptation.orgenizer_logo);
 
     const signedUrls = await Promise.all(response.map(async (item) => {
