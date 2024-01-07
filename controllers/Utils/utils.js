@@ -131,7 +131,6 @@ export const pdfConvert = async (req, res) => {
   try {
     const { comp_id, org_id } = req.body;
     const athleteData = await fetchDataFromDatabase(org_id, comp_id);
-    console.log(athleteData);
 
     const dynamicHtml = mustache.render(mandatHtml, { athleteData });
 
@@ -183,10 +182,15 @@ const fetchDataFromDatabase = async (orgId, compId) => {
       },
     });
 
-    const img = await imageGetProfile(response[0].comptation.orgenizer_logo);
+    const imageGetProfile1 = async (key) => {
+      const url = await getObjectURL(key);
+      return url
+    };
+
+    const img = await imageGetProfile1(response[0].comptation.orgenizer_logo);
 
     const signedUrls = await Promise.all(response.map(async (item) => {
-      const profileUrl = await imageGetProfile(item.athlete.profile_img);
+      const profileUrl = await imageGetProfile1(item.athlete.profile_img);
       
       return {
         athlete_name: item.athlete.username,
@@ -201,7 +205,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
     }));
     return signedUrls
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.error('Data aldaaa error pdf:', error);
     return ('Internal Server Error');
   }
 };
