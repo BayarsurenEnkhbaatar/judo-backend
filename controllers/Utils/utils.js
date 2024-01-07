@@ -131,6 +131,7 @@ export const pdfConvert = async (req, res) => {
   try {
     const { comp_id, org_id } = req.body;
     const athleteData = await fetchDataFromDatabase(org_id, comp_id);
+    console.log(athleteData);
 
     const dynamicHtml = mustache.render(mandatHtml, { athleteData });
 
@@ -159,8 +160,6 @@ export const pdfConvert = async (req, res) => {
 
     await browser.close();
 
-    // res.setHeader('Content-Type', 'application/pdf');
-    // res.send(pdfBuffer);
     const base64pdf = pdfBuffer.toString('base64');
     res.send(base64pdf);
     
@@ -184,7 +183,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
       },
     });
 
-    const img = await imageGetProfile(response[0].comptation.orgenizer_logo);
+    // const img = await imageGetProfile(response[0].comptation.orgenizer_logo);
 
     const signedUrls = await Promise.all(response.map(async (item) => {
       const profileUrl = await imageGetProfile(item.athlete.profile_img);
@@ -194,7 +193,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
         athlete_lastname: item.athlete.lastname,
         judo_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
         profile: profileUrl,
-        zb_logo: img,
+        zb_logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHdvEiPsW1WYJuAOwuqtj22HcUDI9i2_BlhhuM5WgnVMOyxvZIxFNX_VC4pXetj6WH9zA&usqp=CAU',
         kg: item.kg,
         org_name: item.organization.name,
         comp_name: item.comptation.name,
@@ -203,7 +202,7 @@ const fetchDataFromDatabase = async (orgId, compId) => {
     return signedUrls
   } catch (error) {
     console.error('Error generating PDF:', error);
-    res.status(500).send('Internal Server Error');
+    return ('Internal Server Error');
   }
 };
 
@@ -274,153 +273,149 @@ export const imageUpload1 = async (file) => {
 export const Jin_Protocol_Pdf = async (req, res) => {
   const mandatHtml = `
   <!DOCTYPE html>
-<html lang="en">
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-    @page {
-        size: A4;
-    }
-
-    body {
-        font-family: 'Roboto', sans-serif;
-        margin: 0; /* Remove default margin for accurate A4 size */
-    }
-
-    .container {
-        padding: 2rem;
-        font-family: 'Roboto', sans-serif;
-        max-width: 21cm; /* Set the maximum width to A4 width */
-        margin: auto; /* Center the content on the page */
-    }
-
-        .weigh-in-box {
-            background-color: #a7f3cf;
-            border: 2px solid #718096;
-            border-radius: 0.375rem;
-            padding: 0.5rem;
-            width: 100%;
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        @page {
+            size: A4;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0; /* Remove default margin for accurate A4 size */
         }
 
-        .weight {
-            font-weight: bold;
-            text-align: center;
-            font-size: 3rem;
-            margin-top: 0.5rem;
-        }
-        
-          .weight-1 {
-            font-weight: bold;
-            text-align: center;
-            font-size: 2.5rem;
-            margin-top: 0.5rem;
-            color: #a7f3cf;
+        .container {
+            padding: 2rem;
+            font-family: 'Roboto', sans-serif;
+            max-width: 21cm; /* Set the maximum width to A4 width */
+            margin: auto; /* Center the content on the page */
         }
 
-        .title {
-            font-weight: bold;
-            text-align: center;
-            font-size: 2.4rem;
-        }
-          .title-1 {
-            font-weight: bold;
-            text-align: center;
-            font-size: 1.5rem;
-        }
+            .weigh-in-box {
+                background-color: #a7f3cf;
+                border: 2px solid #718096;
+                border-radius: 0.375rem;
+                padding: 0.5rem;
+                width: 100%;
+            }
 
-        .table-container {
-            margin-top: 1rem;
-        }
+            .header {
+                display: flex;
+                justify-content: space-between;
+            }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid #cbd5e0;
-        }
+            .weight {
+                font-weight: bold;
+                text-align: center;
+                font-size: 3rem;
+                margin-top: 0.5rem;
+            }
+            
+              .weight-1 {
+                font-weight: bold;
+                text-align: center;
+                font-size: 2.5rem;
+                margin-top: 0.5rem;
+                color: #a7f3cf;
+            }
 
-        th,
-        td {
-            border: 1px solid #cbd5e0;
-            padding: 0.5rem;
-            text-align: center;
-        }
+            .title {
+                font-weight: bold;
+                text-align: center;
+                font-size: 2.4rem;
+            }
+              .title-1 {
+                font-weight: bold;
+                text-align: center;
+                font-size: 1.5rem;
+            }
 
-        th {
-            font-weight: bold;
-            font-size: 0.875rem;
-        }
+            .table-container {
+                margin-top: 1rem;
+            }
 
-        td {
-            font-size: 0.75rem;
-        }
-        td.text-wrap {
-            max-width: 40rem; /* Set the maximum width as needed */
-            word-wrap: break-word;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid #cbd5e0;
+            }
 
-    </style>
-</head>
+            th,
+            td {
+                border: 1px solid #cbd5e0;
+                padding: 0.5rem;
+                text-align: center;
+            }
 
-<body>
-    <div class="container">
-        <div class="weigh-in-box">
-            <div class="header">
-                <h1 class="weight-1">${req.body.jin} kg</h1>
-                <div>
-                    <h1 class="title">Weigh-in-List</h1>
-                    <h1 class="title-1">{{comp_name}}</h1>
+            th {
+                font-weight: bold;
+                font-size: 0.875rem;
+            }
+
+            td {
+                font-size: 0.75rem;
+            }
+            td.text-wrap {
+                max-width: 40rem; /* Set the maximum width as needed */
+                word-wrap: break-word;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="weigh-in-box">
+                <div class="header">
+                    <h1 class="weight-1">${req.body.jin} kg</h1>
+                    <div>
+                        <h1 class="title">Weigh-in-List</h1>
+                        <h1 class="title-1">{{comp_name}}</h1>
+                    </div>
+                    <h1 class="weight">${req.body.jin} кг</h1>
                 </div>
-                <h1 class="weight">${req.body.jin} кг</h1>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Клуб</th>
+                            <th>Овог</th>
+                            <th>Нэр</th>
+                            <th>Төрсөн огноо</th>
+                            <th>Жин</th>
+                            <th>Гарын үсэг</th>
+                            <th>Out</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {{#athleteData}}
+                        <tr>
+                            <td>1</td>
+                            <td>{{org_name}}</td>
+                            <td class="text-wrap">{{athlete_lastname}}</td>
+                            <td>{{athlete_name}}</td>
+                            <td>{{birth_date}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                      {{/athleteData}}
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Клуб</th>
-                        <th>Овог</th>
-                        <th>Нэр</th>
-                        <th>Төрсөн огноо</th>
-                        <th>Жин</th>
-                        <th>Гарын үсэг</th>
-                        <th>Out</th>
-                    </tr>
-                </thead>
-                <tbody>
-                  {{#athleteData}}
-                    <tr>
-                        <td>1</td>
-                        <td>{{org_name}}</td>
-                        <td class="text-wrap">{{athlete_lastname}}</td>
-                        <td>{{athlete_name}}</td>
-                        <td>{{birth_date}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                  {{/athleteData}}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</body>
+    </body>
 
-</html>
+    </html>
 
 `;
 
-// <td>{{organization.name}}</td>
-//                         <td class="text-wrap">{{athlete.lastname}}</td>
-//                         <td>{{athlete.username}}</td>
-//                         <td>{{athlete.birth_date}}</td>
   try {
     const { comp_id, jin } = req.body;
     const athleteData = await fJinDatabase(jin, comp_id);
